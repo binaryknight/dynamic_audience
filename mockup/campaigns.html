@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Campaign</title>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./Campaign_files/bootstrap.min.css">
+        <link rel="stylesheet" href="./Campaign_files/bootstrap-select.min.css">
+        <script src="./Campaign_files/jquery.min.js"></script>
+        <script src="./Campaign_files/jquery-ui.js"></script>
+        <script src="./Campaign_files/popper.min.js"></script>
+        <script src="./Campaign_files/bootstrap.min.js"></script>
+        <script src="./Campaign_files/bootstrap-select.min.js"></script>
+<script src="./axios.min.js"></script>
+
+        <style>
+            .campaign-new-filter {
+                margin-top: 30px;
+            }
+            .campaign-filter {
+                margin-top: 5px;
+            }
+			.campaign-record-count {
+				margin-top: 20px;
+			}
+        </style>
+    </head>
+    <body>
+
+<script>
+
+
+ window.onload = function () {
+// Test auth token.  Need to serve page from server instead
+var authorization = '';
+
+                    var authToken = JSON.parse(localStorage.getItem("jhi-authenticationToken")
+                        || sessionStorage.getItem("jhi-authenticationToken"));
+                    if (authToken) {
+                        authorization = "Bearer " + authToken;
+                    }
+//alert(authorization);
+
+
+
+
+}
+
+
+</script>
+	
+
+<label class=""><h2>Campaign Definition</h2></label>
+<table class="">
+<tr><td>Name &nbsp;&nbsp;</td><td><input type=text /> &nbsp;&nbsp;</td>
+</table>
+<!-- this should go to a selection list of deployments for this campaignid instead of directly to the deployment editor  -->
+<button onclick='javascript:window.location="segments.html"' >Select Deployments</button>
+</body></html>

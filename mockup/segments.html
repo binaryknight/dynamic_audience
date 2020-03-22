@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Deployment</title>
+        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="./Campaign_files/bootstrap.min.css">
+        <link rel="stylesheet" href="./Campaign_files/bootstrap-select.min.css">
+        <script src="./Campaign_files/jquery.min.js"></script>
+        <script src="./Campaign_files/jquery-ui.js"></script>
+        <script src="./Campaign_files/popper.min.js"></script>
+        <script src="./Campaign_files/bootstrap.min.js"></script>
+        <script src="./Campaign_files/bootstrap-select.min.js"></script>
+<script src="./axios.min.js"></script>
+
+        <style>
+            .campaign-new-filter {
+                margin-top: 30px;
+            }
+            .campaign-filter {
+                margin-top: 5px;
+            }
+			.campaign-record-count {
+				margin-top: 20px;
+			}
+        </style>
+    </head>
+    <body>
+
+<script>
+
+
+ window.onload = function () {
+// Test auth token.  Need to serve page from server instead
+var authorization = '';
+
+                    var authToken = JSON.parse(localStorage.getItem("jhi-authenticationToken")
+                        || sessionStorage.getItem("jhi-authenticationToken"));
+                    if (authToken) {
+                        authorization = "Bearer " + authToken;
+                    }
+//alert(authorization);
+
+var current_deployment = {};
+
+ axios.request({url:'/api/options', withCredentials: true, headers: {'Authorization':authorization} }).then(function (response) {
+    console.log('axios get info ok');
+    console.log(response);
+    dimension_data = response.data;
+    console.log(dimension_data);
+
+ sample_data = {"segments":[{"segment_type":"Hand Raiser", "suppress":false, "segment_props":[{"name":"campaign_id","desc":"Campaign ID","value":"10101"},{"name":"start_date","desc":"Start Date","value":"2020-01-01"},{"name":"end_date","desc":"End Date","value":"2020-02-01"}],"segment_filters":[{"filter_type":"Prior ecom purchaser","filter_value":"yes"},{"filter_type":"Zipcode","filter_value":"75025"}]}, {"segment_type":"Community Segments", "suppress":false, "segment_props":[{"name":"community_value","desc":"Community Value","value":"gamers"},{"name":"community_confidence","desc":"Community Confidence","value":"80"},{"name":"community_source","desc":"Community Source","value":"mktg1"}],"segment_filters":[]} ]};
+
+ example_deployment = {"id":"1d71760b-9173-47c1-a238-d732bcb25a27","name":"MyDeployment","data":JSON.stringify(sample_data),"lob":"HA","status":"Test","campaignid":"123123123"};
+
+
+  axios.request({url:'/api/deployments',params:{'page':0,'size':10,'sort':'id'}, withCredentials: true, headers: {'Authorization':authorization} }).then(function (response) {
+  
+    console.log('axios get deployment ok');
+    console.log(response);
+    //if (response.data.length > 0) {
+      //current_deployment = response.data[0];
+    //} else {
+      current_deployment = example_deployment;
+    //}
+    
+    console.log(current_deployment);
+ 
+    axios.request({url:'/api/deployments', method:'post', data:current_deployment, withCredentials: true, headers: {'Authorization':authorization} }).then(function (response) {
+      console.log('axios save ok');
+      console.log(response);
+
+
+       })
+       .catch(function (error) {
+         console.log(error);
+       });
+
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+
+ })
+.catch(function (error) {
+    console.log(error);
+  });
+
+
+}
+
+
+</script>
+	
+
+<label class=""><h2>Deployment Definition</h2></label>
+<table class="">
+<tr><td>Name &nbsp;&nbsp;</td><td><input type=text /> &nbsp;&nbsp;</td>
+<td>Channel &nbsp;&nbsp; <select class="selectpicker segment-option-selector">
+    <option selected>Email</option>
+    <option>Ecom</option>
+    </select> 
+</td>
+</tr>
+</table>
+<label class=""><b>Deployment Information</b></label>
+<table>
+ <tr><td>Campaign Owner (LOB)</td><td><input type=text></td></tr>
+ <tr><td>Campaign Stage</td><td><input type=text></td></tr>
+ <tr><td>Deployment Date</td><td><input type=text></td></tr>
+ <tr><td>Touch Number</td><td><input type=text></td></tr>
+ <tr><td>Email/Remail</td><td><input type=text></td></tr>
+ </table>
+<label class=""><b>Product Information</b></label>
+<table>
+ <tr><td>Product Category</td><td><input type=text></td></tr>
+ <tr><td>Product Promoted</td><td><input type=text></td></tr>
+ <tr><td>Product Launch Date</td><td><input type=text></td></tr>
+</table>
+        <hr>
+        <div id="campaign-container">
+            <div id="campaign-section-placeholder">
+
+            <div class="campaign-section container">
+                <div class="campaign-filter row no-gutters">
+                </div>
+            <div class="container-fluid">
+                <div class="row no-gutters">
+				    <div class="col text-center">
+                 		<button type="button" class="btn btn-primary campaign-add-section">Add Segment</button>
+						<button type="button" class="btn btn-primary ">Save</button>
+						<button type="button" class="btn btn-primary " onclick='javascript:window.location="queue.html"' >Run</button>
+						<br><br>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+	    		<div class="col col-3 text-left" ><label class="medium text-muted pr-2 ">Segment Type</label></div>
+	    		<div class="col col-6 text-left" ><label class="medium text-muted pr-2 ">Segment Name</label></div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript" charset="utf-8">
+            var columns = [];
+
+            var sectionTemplate =
+            '<div class="campaign-section container-fluid">' +
+                    '<div class="row">' +
+                        '<div class="col col-3">' +
+                            '<table><tr><td><select class="selectpicker segment-option-selector">' +
+                                '<option value="s0" selected>(Select type)</option>' +
+                                '<option value="s1" >Hand Raiser</option>' +
+                                '<option value="s2">Reserver</option>' +
+								'<option value="s3">Email Engager</option>' +
+								'<option value="s4">Product Registrant</option>' +
+								'<option value="s5">Web url visitor</option>' +
+								'<option value="s6">Community segments</option>' +
+								'<option value="s7">DS Models</option>' +
+                                '<option value="s8">EPP</option>' +
+                                '<option value="s9">All Emailable (catch all)</option>' +
+                                '<option value="s10">App activity</option>' +
+                            '</select></td></tr><tr><td>Priority <input type=text size=2 />&nbsp;&nbsp;</td></tr><tr><td>Suppress audience? <input type="checkbox"></td></tr></table>' +
+                        '</div>' +
+                        '<div class="col">' +
+                            '<input type=text />' +
+                        '</div>' +
+                        '<div class="col s1">' +
+                                '<table><tr><td><label class="medium text-muted  ">Campaign ID &nbsp;</label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Campaign Start Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Campaign End Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr></table>' +
+                        '</div>' +
+                        '<div class="col s2">' +
+                                '<table><tr><td><label class="medium text-muted  ">Campaign ID &nbsp;</label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Campaign Start Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Campaign End Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr></table>' +
+                        '</div>' +
+                        '<div class="col s3">' +
+                                '<table><tr><td><label class="medium text-muted  ">Email Campaign Name &nbsp;</label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Open or Click </label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr></table>' +
+                        '</div>' +
+                        '<div class="col s4">' +
+                                '<table><tr>'+
+                                '<td><label class="medium text-muted  ">Device hierarchy </label></td>' +
+                                '<td><select class="selectpicker">' +
+                                '<option value="s1">LOB</option>' +
+                                '<option value="s2">Major Category</option>' +
+								'<option value="s3">Product Category</option>' +
+								'<option value="s4">SKU</option>' +
+                                '</select><input text class="campaign_values"/></td>'+
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Start Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">End Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Carrier </label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr>' +
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col s5">' +
+                                '<table><tr>'+
+                                '<td><label class="medium text-muted  ">Url ID </label></td>' +
+                                '<td><input text class="campaign_values"/></td>'+
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Start Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">End Date </label></td>' +
+                                '<td><input text class="campaign_values datepicker"/></br></td></tr>' +
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col s6">' +
+                                '<table><tr>'+
+                                '<td><label class="medium text-muted  ">Community value </label></td>' +
+                                '<td><input text class="campaign_values"/></td>'+
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Community confidence </label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr>' +
+                                '<tr><td><label class="medium text-muted pr-2 campaign-hidden">Community source </label></td>' +
+                                '<td><input text class="campaign_values"/></br></td></tr>' +
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col s7">' +
+                                '<table><tr>'+
+                                '<td><label class="medium text-muted  ">Model name </label></td>' +
+                                '<td><input text class="campaign_values"/></td>'+
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col s8">' +
+                                '<table><tr>'+
+                                '<td nowrap><label class="medium text-muted  ">Single Domain? &nbsp;&nbsp; </label><input type="checkbox" class="campaign_values"/></td></tr><tr>' +
+                                '<td><label class="medium text-muted  ">Domain Name</label></td>' +
+                                '<td><input text class="campaign_values"/></td></tr><tr>'+
+                                '<td><label class="medium text-muted  ">Prospect or Enrollee? </label></td>' +
+                                '<td><input text class="campaign_values"/></td>'+
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col s9">' +
+                                '<table><tr>'+
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col s10">' +
+                                '<table><tr>'+
+                                '<td><label class="medium text-muted  ">App name </label></td>' +
+                                '<td><input text class="campaign_values"/></td></tr><tr>'+
+                                '<td><label class="medium text-muted  ">Activity Level </label></td>' +
+                                '<td><input text class="campaign_values"/></td>'+
+                                '</tr></table>' +
+                        '</div>' +
+                        '<div class="col">' +
+                            '<button type="button" class="btn btn-primary campaign-new-filter newFilter">Add Filter</button>' +
+                            '<nbsp>'+
+                        '</div>' +
+            '</div>';
+
+            var filterTemplate =
+            '<div class="campaign-filter row no-gutters">' +
+                '<div class="col-6">' +
+                    '<div class="row">' +
+                        '<div class="col">' +
+                            '<table><tr>' +
+                            '<td>&nbsp;</td>' +
+                            '<td>&nbsp;</td>' +
+                            '<td>&nbsp;</td>' +
+                            '<td>&nbsp;</td>' +
+                            '<td><label class="medium text-muted pr-2 ">Filter Type</label></td>' +
+                            '<td><select class="selectpicker campaign-operator">' +
+                                '<option>Carrier</option>' +
+                                '<option>Prior ecom purchaser</option>' +
+								'<option>High EBP</option>' +
+								'<option>Zipcode</option>' +
+								'<option>State</option>' +
+				            '</select></td>' +
+                            '<td><label class="medium text-muted pr-2 ">Value</label></td>' +
+                            '<td><input text class="campaign_values"/></td></td></table>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+
+            $(document).ready(function() {
+                function getColumns() {
+                    $.getJSON('/columns', { table: 't_ds_cdm2_segmentation_agg' }, function (data) {
+                        columns = data;
+                        var section = createCampaignSection();
+                        populateCampaignColumn(section.children('.campaign-filter').first());
+                    });
+                }
+
+                function hideOpts(s) {
+                    s.find('.s1').hide();
+                    s.find('.s2').hide();
+                    s.find('.s3').hide();
+                    s.find('.s4').hide();
+                    s.find('.s5').hide();
+                    s.find('.s6').hide();
+                    s.find('.s7').hide();
+                    s.find('.s8').hide();
+                    s.find('.s9').hide();
+                    s.find('.s10').hide();
+                    s.find('.datepicker').datepicker();
+                }
+
+                function createCampaignSection() {
+                    $('#campaign-section-placeholder').append('<hr/>' + sectionTemplate + '<br/><hr/>');
+                    var newSection = $('#campaign-section-placeholder').children('.campaign-section').last();
+                    //newSection.append(filterTemplate);
+                    //newSection.find('.selectpicker').each(function(i, element) {
+                    //    $(element).selectpicker('refresh');
+                    //});
+
+                    hideOpts(newSection);
+
+                    newSection.on('change', '.segment-option-selector', function() {
+                         v = $( this ).val() ;
+                         if (v.length > 0) {
+                            hideOpts(newSection);
+                            newSection.find('.'+v).show()
+
+                         }
+                    });
+
+                    return newSection;
+                }
+
+                function populateCampaignColumn(filter) {
+                    var campaignColumn = $(filter).find('select.campaign_columns').first();
+                    columns.forEach(function(column) {
+                        campaignColumn.append(
+                            $("<option></option>")
+                                .attr("value", column)
+                                .text(column));
+                    });
+                    //campaignColumn.selectpicker('refresh');
+                }
+
+                function populateCampaignValues(filter, values) {
+                    var campaignValues = $(filter).find('select.campaign_values').first();
+                    campaignValues.empty();
+                    values.forEach(function(value) {
+                        campaignValues.append(
+                            $("<option></option>")
+                                .attr("value", value)
+                                .text(value));
+                    });
+                    //campaignValues.selectpicker('refresh');
+                }
+
+                /*getColumns();*/
+
+                $('#campaign-section-placeholder').on('click', 'button.newFilter', function() {
+                    var campaignSection = $(this).parents('div.campaign-section').first();
+                    campaignSection.append(filterTemplate+'<hr/>');
+                    var newFilter = campaignSection.children('div.campaign-filter').last();
+                    populateCampaignColumn(newFilter);
+                    newFilter.find('select.selectpicker').each(function(i, element) {
+                        $(element).selectpicker('refresh');
+                    });
+                    newFilter.find('.campaign-hidden').hide();
+                    newFilter.find('button.newFilter').remove();
+                });
+
+                $('#campaign-section-placeholder').on('change', 'select.campaign_columns', function() {
+                    var campaignFilter = $(this).parents('div.campaign-filter').first();
+                    var column = campaignFilter.find('select.campaign_columns').first().val();
+                   // $.getJSON('/values', { table: 't_ds_cdm2_segmentation_agg', column: column },  function (data) {
+                       // populateCampaignValues(campaignFilter, data);
+                    //});
+                });
+				
+				$('button.campaign-add-section').on('click', function() {
+					var section = createCampaignSection();
+                    section.find('select.selectpicker').each(function(i, element) {
+                        $(element).selectpicker('refresh');
+                    });
+					//populateCampaignColumn(section.children('.campaign-filter').first());
+                });
+
+                $('#campaign-container').on('click', 'button.campaign-generate', function() {
+                    var sections = [];
+                    $('div.campaign-section').each(function(i, section) {
+                        var filters = [];
+                        
+                        $(section).find('div.campaign-filter').each(function(i, filter) {
+                            filters.push({
+                                table: 't_ds_cdm2_segmentation_agg',
+                                column: $(filter).find('select.campaign_columns').first().val(),
+                                operator: $(filter).find('select.campaign-operator').first().val(),
+                                values: $(filter).find('select.campaign_values').first().val()
+                            });
+                        });
+
+                        sections.push({
+                            filters: filters
+                        });
+                    });
+
+					$.ajax({
+						url: '/generate',
+						type: 'POST',
+						data: JSON.stringify(sections),
+						contentType: 'application/json; charset=utf-8',
+						dataType: 'json',
+						success: function(data) {
+							$('div.campaign-section').each(function(i, section) {
+								$(section).find('.campaign-record-count').first().text('Record count : ' + data[i]);
+							});
+							console.log('done!');
+						}
+					});
+                });
+            });
+        </script>
+    
+
+</body></html>
